@@ -7,6 +7,7 @@
   };
 
   outputs = { self, nixpkgs, stylix, ... }:
+  {
     let
       nixpaletteLib = import ./lib { inherit (nixpkgs) lib; };
       builtinThemesDir = ./themes;
@@ -28,4 +29,5 @@
         ];
       };
     };
+  };
 }
