@@ -1,0 +1,9 @@
+Place your wallpaper image here (e.g. wallpaper.png or wallpaper.jpg).
+
+Then reference it in theme.nix:
+
+    wallpaper = ./wallpaper.png;
+
+When no wallpaper is provided (wallpaper = null), Stylix will generate
+a wallpaper from the theme's color scheme, or the user can supply one
+via nixpalette.stylixOverrides or by setting stylix.image directly.
