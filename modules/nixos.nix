@@ -91,7 +91,7 @@ in
 
     specialisation = lib.mapAttrs (_name: themeId: {
       configuration = {
-        nixpalette.theme = themeId;
+        nixpalette.theme = lib.mkForce themeId;
         nixpalette.specialisations = lib.mkForce {};
       };
     }) cfg.specialisations;
