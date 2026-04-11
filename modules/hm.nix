@@ -20,6 +20,12 @@ let
     inherit (cfg) stylixOverrides;
   };
 
+  colorsJson = builtins.toJSON {
+    themeId  = cfg.theme;
+    polarity = resolvedTheme.polarity;
+    base16   = resolvedTheme.base16;
+  };
+
 in
 {
   options.nixpalette = {
@@ -63,5 +69,7 @@ in
 
   config = lib.mkIf cfg.enable {
     stylix = stylixConfig;
+
+    xdg.dataFile."nixpalette/colors.json".text = colorsJson;
   };
 }

@@ -20,6 +20,12 @@ let
     inherit (cfg) stylixOverrides;
   };
 
+  colorsJson = builtins.toJSON {
+    themeId  = cfg.theme;
+    polarity = resolvedTheme.polarity;
+    base16   = resolvedTheme.base16;
+  };
+
 in
 {
   options.nixpalette = {
@@ -59,9 +65,35 @@ in
       example = lib.literalExpression ''{ cursor.size = 32; }'';
     };
 
+    specialisations = lib.mkOption {
+      type        = lib.types.attrsOf lib.types.str;
+      default     = {};
+      description = ''
+        Pre-build alternative theme configurations as NixOS specialisations.
+        Each key is a specialisation name and each value is a namespaced theme ID.
+        Switch between pre-built themes instantly without a network build:
+          sudo /run/current-system/specialisation/<name>/bin/switch-to-configuration switch
+      '';
+      example = lib.literalExpression ''
+        {
+          dark  = "builtin:base/catppuccin-mocha";
+          light = "builtin:base/nord";
+        }
+      '';
+    };
+
   };
 
   config = lib.mkIf cfg.enable {
     stylix = stylixConfig;
+
+    environment.etc."nixpalette/colors.json".text = colorsJson;
+
+    specialisation = lib.mapAttrs (_name: themeId: {
+      configuration = {
+        nixpalette.theme = themeId;
+        nixpalette.specialisations = lib.mkForce {};
+      };
+    }) cfg.specialisations;
   };
 }

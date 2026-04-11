@@ -89,6 +89,7 @@ homeConfigurations.myUser = home-manager.lib.homeManagerConfiguration {
 | `nixpalette.theme` | `str` | — | Namespaced theme ID (e.g. `"builtin:base/catppuccin-mocha"`) |
 | `nixpalette.userThemeDir` | `null or path` | `null` | Path to user theme directory |
 | `nixpalette.stylixOverrides` | `attrs` | `{}` | Extra Stylix options merged on top of the theme |
+| `nixpalette.specialisations` | `attrsOf str` | `{}` | Pre-build theme variants as NixOS specialisations (NixOS only) |
 
 ## Theme Identifiers
 
@@ -162,7 +163,9 @@ assets/themes/           # ← nixpalette.userThemeDir = ./assets/themes;
 }
 ```
 
-Font `package` values must be top-level nixpkgs attribute names (e.g. `"jetbrains-mono"`, `"inter"`).
+When `wallpaper` is `null`, nixpalette automatically generates a solid-color wallpaper from the theme's background color (`base00`). To ship a custom wallpaper, place the image file in the theme directory and reference it with a relative path.
+
+Font `package` values are nixpkgs attribute paths. Use top-level names like `"inter"` or dot-separated paths for nested packages like `"nerd-fonts.jetbrains-mono"`.
 
 ### Derived theme format (`theme.nix`)
 
@@ -246,18 +249,61 @@ stylix.fonts.monospace = {
 | `builtin:base/nord` | dark | Arctic, north-bluish palette |
 | `builtin:derived/catppuccin-mocha-compact` | dark | Catppuccin Mocha with smaller fonts and Iosevka |
 
+## Fast Theme Switching with Specialisations
+
+nixpalette supports NixOS [specialisations](https://nixos.wiki/wiki/Specialisation) to pre-build multiple theme configurations into a single system closure. This enables near-instant theme switching — no network fetch or Nix build required.
+
+### Setup
+
+```nix
+nixpalette = {
+  enable = true;
+  theme = "builtin:base/catppuccin-mocha";  # default theme
+  specialisations = {
+    nord    = "builtin:base/nord";
+    compact = "builtin:derived/catppuccin-mocha-compact";
+  };
+};
+```
+
+### Switching
+
+```bash
+# Switch to the pre-built "nord" theme
+sudo /run/current-system/specialisation/nord/bin/switch-to-configuration switch
+
+# Switch back to the default
+sudo /run/current-system/bin/switch-to-configuration switch
+```
+
+Each specialisation is a full NixOS configuration with a different `nixpalette.theme`. All specialisations share the same Nix store, so common packages are not duplicated.
+
+> **Note:** Specialisations are a NixOS-only feature. They are not available in Home Manager.
+
+## Colors Export
+
+nixpalette generates a JSON file with the resolved theme's color scheme at build time:
+
+- **NixOS:** `/etc/nixpalette/colors.json`
+- **Home Manager:** `$XDG_DATA_HOME/nixpalette/colors.json`
+
+This file contains the theme ID, polarity, and full base16 palette. Use it in scripts, widgets, or external tools:
+
+```bash
+# Read the current accent color
+jq -r '.base16.base0D' /etc/nixpalette/colors.json
+```
+
 ## Future Theme Switcher Integration
 
 nixpalette is designed to support a future theme switcher:
 
 - **Discovery:** Themes are discovered by scanning `base/` and `derived/` directories under both the builtin and user roots. A switcher CLI can call `nixpaletteLib.loadAllThemes` to enumerate all available themes with their metadata.
-- **Selection:** The active theme is a plain string option (`nixpalette.theme`). A switcher only needs to write the new theme ID and trigger a NixOS rebuild.
+- **Selection:** The active theme is a plain string option (`nixpalette.theme`). A switcher only needs to write the new theme ID and trigger a NixOS rebuild (or switch to a pre-built specialisation).
 - **Preview:** Each theme can include a `preview` field in `meta.nix` pointing to a screenshot, enabling visual browsing before selection.
 
 ## Known Limitations
 
-- **No live switching** — changing themes requires a NixOS rebuild (`nixos-rebuild switch` or equivalent)
-- **Wallpaper handling** — built-in themes ship without wallpapers (`wallpaper = null`). Provide your own via the theme or `stylix.image`
-- **Font packages** — the `package` field in themes must be a top-level nixpkgs attribute name; nested paths (e.g. `nerd-fonts.jetbrains-mono`) are not supported — use `stylixOverrides` for those
+- **Rebuild required** — theme changes require a NixOS rebuild. Use [specialisations](#fast-theme-switching-with-specialisations) to pre-build multiple themes for near-instant switching without a network build
 - **Single parent** — each derived theme can inherit from exactly one parent; multiple inheritance is not supported
 - **Evaluation-time resolution** — theme loading uses `builtins.readDir` at Nix evaluation time; the theme directory must exist and be accessible during `nix eval`
