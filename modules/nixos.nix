@@ -1,7 +1,7 @@
 # NixOS module for nixpalette.
 # Declares user-facing options, loads themes, resolves inheritance,
 # and delegates to Stylix via modules/stylix.nix.
-{ nixpaletteLib, builtinThemesDir }:
+{ nixpaletteLib, builtinThemesDir, defaultWallpaper }:
 
 { config, lib, pkgs, ... }:
 
@@ -18,6 +18,7 @@ let
   stylixConfig = import ./stylix.nix {
     inherit lib pkgs resolvedTheme;
     inherit (cfg) stylixOverrides;
+    wallpaper = cfg.defaultWallpaper;
   };
 
   colorsJson = builtins.toJSON {
@@ -70,6 +71,18 @@ in
         Set to null to use only built-in themes.
       '';
       example = lib.literalExpression "./assets/themes";
+    };
+
+    defaultWallpaper = lib.mkOption {
+      type        = lib.types.nullOr lib.types.path;
+      default     = defaultWallpaper;
+      description = ''
+        Wallpaper used for any theme that does not ship its own wallpaper image.
+        Defaults to the flake-root wallpaper.png when present, otherwise null.
+        When null, a solid-color wallpaper is generated from the theme's base00.
+        Set this to override the flake default with your own image.
+      '';
+      example = lib.literalExpression "./my-wallpaper.png";
     };
 
     stylixOverrides = lib.mkOption {

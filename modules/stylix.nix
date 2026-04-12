@@ -1,7 +1,7 @@
 # Translates a resolved nixpalette theme into Stylix option values.
 # All theme-provided values use mkDefault so users can override them
 # either through stylixOverrides or by setting stylix.* directly.
-{ lib, pkgs, resolvedTheme, stylixOverrides }:
+{ lib, pkgs, resolvedTheme, stylixOverrides, wallpaper }:
 
 let
   fonts        = resolvedTheme.fonts or {};
@@ -9,12 +9,21 @@ let
   hasWallpaper = resolvedTheme ? wallpaper && resolvedTheme.wallpaper != null;
 
   # Generate a solid-color wallpaper from the theme's background color.
-  # Used as a fallback when the theme does not provide a wallpaper image.
+  # Last-resort fallback when neither the theme nor the user provides a wallpaper.
   fallbackWallpaper = pkgs.runCommand "nixpalette-wallpaper.png" {
     nativeBuildInputs = [ pkgs.imagemagick ];
   } ''
     magick -size 3840x2160 xc:'#${resolvedTheme.base16.base00}' png:$out
   '';
+
+  # Wallpaper priority:
+  #   1. Theme-specific wallpaper (theme.wallpaper != null)
+  #   2. nixpalette.defaultWallpaper (user override or flake root wallpaper.png)
+  #   3. Auto-generated solid-color PNG from base00
+  activeWallpaper =
+    if hasWallpaper          then resolvedTheme.wallpaper
+    else if wallpaper != null then wallpaper
+    else                           fallbackWallpaper;
 
   # Resolve a font package from a string reference.
   # Supports dot-separated paths (e.g. "nerd-fonts.jetbrains-mono") as well as
@@ -37,10 +46,7 @@ lib.mkMerge [
     enable       = true;
     base16Scheme = lib.mkDefault resolvedTheme.base16;
     polarity     = lib.mkDefault resolvedTheme.polarity;
-    image        = lib.mkDefault (
-      if hasWallpaper then resolvedTheme.wallpaper
-      else fallbackWallpaper
-    );
+    image        = lib.mkDefault activeWallpaper;
   }
 
   (lib.mkIf hasFonts {
