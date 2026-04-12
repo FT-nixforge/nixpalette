@@ -1,0 +1,130 @@
+You are building `nixpalette-kde` — a NixOS/Home Manager flake that integrates
+the nixpalette theme framework with the KDE Plasma 6 desktop environment.
+
+## What nixpalette provides (the dependency)
+
+nixpalette (github:FTMahringer/nixpalette) is a theme management flake built on
+top of Stylix. At build time it writes two files:
+
+  NixOS:        /etc/nixpalette/colors.json
+                /etc/nixpalette/themes.json
+  Home Manager: $XDG_DATA_HOME/nixpalette/colors.json
+                $XDG_DATA_HOME/nixpalette/themes.json
+
+colors.json structure:
+  { "themeId": "builtin:base/nord", "polarity": "dark", "base16": { "base00": "2e3440", ... } }
+
+themes.json structure:
+  { "<themeId>": { "themeId": "...", "polarity": "...", "base16": { ... }, "meta": { ... } }, ... }
+
+All base16 hex values are plain 6-character strings WITHOUT a leading #.
+Standard semantic mapping: base00=background, base05=foreground, base08=red,
+base0B=green, base0D=blue, base0E=purple.
+`polarity` ("dark"/"light") maps to KDE's color scheme mode.
+
+## What nixpalette-kde should provide
+
+A separate flake with nixosModules.default and homeModules.default that
+adds KDE Plasma 6 theming on top of nixpalette. All options live under the
+`nixpalette-kde` namespace.
+
+KDE Plasma theming is done primarily via:
+- plasma-manager (Home Manager module for Plasma 6, github:nix-community/plasma-manager)
+  which exposes programs.plasma6.* options
+- KDE color scheme files (.colors) written to ~/.local/share/color-schemes/
+- plasma-apply-colorscheme CLI for runtime application
+
+Prefer plasma-manager's attrset approach over raw config file manipulation.
+
+### 1. Wallpaper via plasma-manager
+- Declare `nixpalette-kde.wallpaper.enable` (default: true)
+- Set programs.plasma6.workspace.wallpaper to the wallpaper path from
+  nixpalette.defaultWallpaper or the active theme
+- Also support slideshow and color wallpaper types as fallback
+
+### 2. KDE Color Scheme generation
+- Declare `nixpalette-kde.colorScheme.enable` (default: true)
+- Generate a .colors file in the KDE color scheme INI format and install it to
+  ~/.local/share/color-schemes/nixpalette-<themeId>.colors
+- Map base16 → KDE color roles:
+    [Colors:Window]
+      BackgroundNormal  → base01
+      ForegroundNormal  → base05
+    [Colors:View]
+      BackgroundNormal  → base00
+      ForegroundNormal  → base05
+      DecorationFocus   → base0D
+      DecorationHover   → base0E
+    [Colors:Button]
+      BackgroundNormal  → base02
+      ForegroundNormal  → base05
+    [Colors:Selection]
+      BackgroundNormal  → base0D
+      ForegroundNormal  → base00
+    [Colors:Tooltip]
+      BackgroundNormal  → base01
+      ForegroundNormal  → base05
+    [General]
+      ColorScheme       → nixpalette-<themeId>
+- Apply via programs.plasma6.colorScheme = "nixpalette-<themeId>"
+- Set dark/light mode via programs.plasma6.workspace.colorScheme or kwriteconfig6
+
+### 3. Konsole color scheme
+- Declare `nixpalette-kde.konsole.enable` (default: true)
+- Generate a Konsole color scheme file (.colorscheme) in
+  ~/.local/share/konsole/nixpalette-<themeId>.colorscheme
+- Map base16 to the 16 ANSI slots + background/foreground
+- Set as default profile color scheme via programs.plasma6 or direct file
+
+### 4. KWin border colors
+- Declare `nixpalette-kde.kwin.enable` (default: true)
+- Set KWin decoration colors through the color scheme (already handled in step 2)
+- Optionally set via kwriteconfig6 for accent color:
+    kdeglobals → [General] AccentColor → base0D
+
+### 5. Live theme switcher
+- Provide package `nixpalette-kde.packages.${system}.nixpalette-switch`
+- Script reads themes.json, presents kdialog or fzf picker, then on selection:
+    1. Writes the new .colors file to ~/.local/share/color-schemes/
+    2. Runs plasma-apply-colorscheme nixpalette-<themeId>
+    3. Runs plasma-apply-desktoptheme if applicable
+    4. Changes wallpaper via dbus:
+         qdbus org.kde.plasmashell /PlasmaShell
+           org.kde.PlasmaShell.evaluateScript "..."
+    5. Writes ~/.cache/nixpalette/active.json
+- Works only for themes in themes.json (nixpalette.preloadThemes)
+- KDE has excellent runtime theming support — this switcher can apply colors,
+  wallpaper, and mode without any logout
+
+## Architecture requirements
+
+- flake inputs:
+    inputs.nixpalette.url      = "github:FTMahringer/nixpalette"
+    inputs.plasma-manager.url  = "github:nix-community/plasma-manager"
+- Re-export nixpalette's modules and plasma-manager's HM module
+- Do NOT re-declare nixpalette options
+- Home Manager module handles color schemes, Konsole, wallpaper, kwin via plasma-manager
+- NixOS module ensures plasma-apply-colorscheme and kwriteconfig6 are in PATH
+
+## Files to create
+
+- flake.nix
+- modules/nixos.nix
+- modules/hm.nix
+- modules/wallpaper.nix
+- modules/color-scheme.nix   (generates + applies .colors file)
+- modules/konsole.nix
+- modules/kwin.nix
+- pkgs/nixpalette-switch/
+- pkgs/kde-color-scheme-gen/  (helper to generate the .colors INI from base16 attrset)
+- README.md
+
+## README should document
+
+- Prerequisites: services.desktopManager.plasma6.enable; plasma-manager in HM imports;
+  nixpalette.preloadThemes set
+- Import instructions for all three flakes
+- nixpalette-switch usage (kdialog GUI picker)
+- KDE-specific advantage: live switching works fully at runtime without logout
+- Each module's options table
+- Note on Plasma 5 vs Plasma 6 (this targets Plasma 6; Plasma 5 users need adjustments)

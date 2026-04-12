@@ -25,9 +25,9 @@
       ];
     };
 
-    homeManagerModules.default = {
+    homeModules.default = {
       imports = [
-        stylix.homeManagerModules.stylix
+        stylix.homeModules.stylix
         (import ./modules/hm.nix { inherit nixpaletteLib builtinThemesDir defaultWallpaper; })
       ];
     };

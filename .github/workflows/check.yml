@@ -38,9 +38,9 @@ jobs:
         run: |
           nix eval .#nixosModules.default --apply 'x: "ok"'
 
-      - name: Verify homeManagerModules export
+      - name: Verify homeModules export
         run: |
-          nix eval .#homeManagerModules.default --apply 'x: "ok"'
+          nix eval .#homeModules.default --apply 'x: "ok"'
 
       - name: Verify built-in themes load
         run: |

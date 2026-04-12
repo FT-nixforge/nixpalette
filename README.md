@@ -70,7 +70,7 @@ nixpalette/
 homeConfigurations.myUser = home-manager.lib.homeManagerConfiguration {
   # ...
   modules = [
-    nixpalette.homeManagerModules.default
+    nixpalette.homeModules.default
     {
       nixpalette = {
         enable = true;

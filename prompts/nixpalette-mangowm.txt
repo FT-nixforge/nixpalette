@@ -37,7 +37,7 @@ Bar:              waybar or similar
 
 ## What nixpalette-mangowm should provide
 
-A separate flake with nixosModules.default and homeManagerModules.default that
+A separate flake with nixosModules.default and homeModules.default that
 adds MangoWM-ecosystem theming on top of nixpalette. All options live under the
 `nixpalette-mangowm` namespace.
 
