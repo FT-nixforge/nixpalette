@@ -13,12 +13,12 @@ A reusable NixOS theme framework built on top of [Stylix](https://github.com/dan
 ## Quick Install
 
 ```nix
-inputs.nixpalette.url = "github:FT-nixforge/nixpalette";
+inputs.nixpalette.url = "github:FT-nixforge/ft-nixpalette";
 ```
 
 ```nix
-imports = [ nixpalette.nixosModules.default ];
-nixpalette = {
+imports = [ ft-nixpalette.nixosModules.default ];
+ft-nixpalette = {
   enable = true;
   theme  = "builtin:base/catppuccin-mocha";
 };
