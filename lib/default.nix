@@ -1,4 +1,4 @@
-# Re-exports all nixpalette library functions.
+# Re-exports all ft-nixpalette library functions.
 { lib }:
 
 let

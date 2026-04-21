@@ -6,4 +6,4 @@ Then reference it in theme.nix:
 
 When no wallpaper is provided (wallpaper = null), Stylix will generate
 a wallpaper from the theme's color scheme, or the user can supply one
-via nixpalette.stylixOverrides or by setting stylix.image directly.
+via "ft-nixpalette".stylixOverrides or by setting stylix.image directly.

@@ -26,7 +26,7 @@ let
     }
     else
       builtins.throw
-        "nixpalette: theme.nix not found in ${toString themeDir}. Every theme folder must contain a theme.nix file.";
+        "ft-nixpalette: theme.nix not found in ${toString themeDir}. Every theme folder must contain a theme.nix file.";
 
   # Load all themes under a single root directory, tagging each with a namespace.
   # Returns an attrset keyed by namespaced IDs like "builtin:base/catppuccin-mocha".

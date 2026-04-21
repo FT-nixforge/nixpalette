@@ -22,6 +22,40 @@
     base0F = "d33682"; # Magenta
   };
 
+  fonts = {
+    serif = {
+      name    = "Source Serif 4";
+      package = "source-serif";
+    };
+    sansSerif = {
+      name    = "Inter";
+      package = "inter";
+    };
+    monospace = {
+      name    = "Fira Code";
+      package = "fira-code";
+    };
+    emoji = {
+      name    = "Noto Color Emoji";
+      package = "noto-fonts-color-emoji";
+    };
+    sizes = {
+      applications = 12;
+      desktop      = 11;
+      popups       = 10;
+      terminal     = 13;
+    };
+  };
+
+  cursor.size = 24;
+
+  opacity = {
+    applications = 0.98;
+    desktop      = 1.0;
+    popups       = 0.99;
+    terminal     = 0.95;
+  };
+
   wallpaper = null;
   overrides = {};
 }

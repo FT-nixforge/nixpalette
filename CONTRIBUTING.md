@@ -1,4 +1,4 @@
-# Contributing to nixpalette
+# Contributing to ft-nixpalette
 
 Thank you for considering a contribution! This document explains how the project is structured, what kind of contributions are welcome, and how to submit them.
 
@@ -13,7 +13,7 @@ Thank you for considering a contribution! This document explains how the project
 ## Project structure
 
 ```
-nixpalette/
+ft-nixpalette/
 ├── flake.nix                  # Flake entry point
 ├── lib/
 │   ├── loader.nix             # Theme discovery (builtins.readDir)
@@ -80,9 +80,16 @@ A base theme must define all required fields:
   # Optional: include fonts. Omit entirely if you have no preference.
   # fonts = { ... };
 
+  # Optional: theme-level cursor defaults. size can be used on its own.
+  # cursor = { size = 24; };
+
+  # Optional: theme-level opacity defaults passed through to Stylix.
+  # opacity = { terminal = 0.93; };
+
   # Set to a path (e.g. ./wallpaper.png) or leave null for auto-generated.
   wallpaper = null;
 
+  # Optional: extra Stylix options merged on top of the theme defaults.
   overrides = {};
 }
 ```
@@ -99,6 +106,7 @@ A derived theme only needs to specify what it overrides plus a `parent`:
     name    = "Iosevka";
     package = "iosevka";
   };
+  cursor.size = 22;
 }
 ```
 

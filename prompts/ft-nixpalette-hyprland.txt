@@ -1,15 +1,15 @@
-You are building `nixpalette-hyprland` — a NixOS/Home Manager flake that
-integrates the nixpalette theme framework with the Hyprland compositor ecosystem.
+You are building `ft-nixpalette-hyprland` — a NixOS/Home Manager flake that
+integrates the ft-nixpalette theme framework with the Hyprland compositor ecosystem.
 
-## What nixpalette provides (the dependency)
+## What ft-nixpalette provides (the dependency)
 
-nixpalette (github:FTMahringer/nixpalette) is a theme management flake built on
+ft-nixpalette (github:FT-nixforge/ft-nixpalette) is a theme management flake built on
 top of Stylix. At build time it writes two files:
 
-  NixOS:        /etc/nixpalette/colors.json
-                /etc/nixpalette/themes.json
-  Home Manager: $XDG_DATA_HOME/nixpalette/colors.json
-                $XDG_DATA_HOME/nixpalette/themes.json
+  NixOS:        /etc/ft-nixpalette/colors.json
+                /etc/ft-nixpalette/themes.json
+  Home Manager: $XDG_DATA_HOME/ft-nixpalette/colors.json
+                $XDG_DATA_HOME/ft-nixpalette/themes.json
 
 colors.json structure:
   { "themeId": "builtin:base/dracula", "polarity": "dark", "base16": { "base00": "282a36", ... } }
@@ -21,24 +21,24 @@ The base16 slots follow the standard semantic conventions (base00=background,
 base05=foreground, base0D=blue/functions, base0E=purple/keywords, etc.)
 All hex values are plain 6-character strings WITHOUT a leading #.
 
-nixpalette also exposes nixosModules.default and homeModules.default which
+ft-nixpalette also exposes nixosModules.default and homeModules.default which
 wire into Stylix for system-wide theming.
 
-## What nixpalette-hyprland should provide
+## What ft-nixpalette-hyprland should provide
 
 A separate flake with its own nixosModules.default and homeModules.default
-that adds Hyprland-ecosystem theming on top of nixpalette. It should:
+that adds Hyprland-ecosystem theming on top of ft-nixpalette. It should:
 
 ### 1. swww — animated wallpaper daemon
-- Declare a `nixpalette-hyprland.swww.enable` option (default: true)
+- Declare a `ft-nixpalette-hyprland.swww.enable` option (default: true)
 - On activation / theme switch, call `swww img <wallpaper>` using the path from
   colors.json or a user-provided override
 - Support static images and GIFs equally (swww handles both natively)
-- Provide a `nixpalette-hyprland.swww.animatedWallpaper` option (null or path)
+- Provide a `ft-nixpalette-hyprland.swww.animatedWallpaper` option (null or path)
   that takes priority over the static wallpaper when set
 
 ### 2. hyprlock — lockscreen
-- Declare a `nixpalette-hyprland.hyprlock.enable` option (default: true)
+- Declare a `ft-nixpalette-hyprland.hyprlock.enable` option (default: true)
 - Generate a hyprlock.conf that uses base16 colors from colors.json:
     background color → base00
     input field background → base01
@@ -49,7 +49,7 @@ that adds Hyprland-ecosystem theming on top of nixpalette. It should:
 - Use Home Manager's programs.hyprlock.extraConfig or the raw config file approach
 
 ### 3. waybar
-- Declare a `nixpalette-hyprland.waybar.enable` option (default: false, non-intrusive)
+- Declare a `ft-nixpalette-hyprland.waybar.enable` option (default: false, non-intrusive)
 - Inject a CSS variables block into the user's waybar style.css:
     @define-color base00 #<base00>;
     @define-color base01 #<base01>;
@@ -58,28 +58,28 @@ that adds Hyprland-ecosystem theming on top of nixpalette. It should:
   hardcoding colors
 
 ### 4. rofi / wofi theme
-- Declare `nixpalette-hyprland.rofi.enable` and `nixpalette-hyprland.wofi.enable`
+- Declare `ft-nixpalette-hyprland.rofi.enable` and `ft-nixpalette-hyprland.wofi.enable`
 - Generate a matching color theme from base16 colors
 
 ### 5. Live theme switcher script
-- Provide a package `nixpalette-hyprland.packages.${system}.nixpalette-switch`
-- The script reads /etc/nixpalette/themes.json (or $XDG_DATA_HOME equivalent),
+- Provide a package `ft-nixpalette-hyprland.packages.${system}.ft-nixpalette-switch`
+- The script reads /etc/ft-nixpalette/themes.json (or $XDG_DATA_HOME equivalent),
   lists available preloaded themes, and lets the user pick one
 - On selection it:
     1. Calls swww to change the wallpaper immediately
-    2. Writes the new colors to a user runtime file (~/.cache/nixpalette/active.json)
+    2. Writes the new colors to a user runtime file (~/.cache/ft-nixpalette/active.json)
     3. Reloads waybar (pkill -SIGUSR2 waybar)
     4. Optionally sends a notification (notify-send)
 - This gives INSTANT theme switching for colors/wallpaper without any rebuild
-  (only works for themes already in themes.json via nixpalette.preloadThemes)
+  (only works for themes already in themes.json via ft-nixpalette.preloadThemes)
 
 ## Architecture requirements
 
-- The flake takes nixpalette as an input and re-exports its modules:
-    inputs.nixpalette.url = "github:FTMahringer/nixpalette";
-- nixpalette-hyprland modules should NOT re-declare nixpalette options — they
-  read from config.nixpalette.* (which nixpalette declares) and from the JSON files
-- All options live under the `nixpalette-hyprland` namespace
+- The flake takes ft-nixpalette as an input and re-exports its modules:
+    inputs."ft-nixpalette".url = "github:FT-nixforge/ft-nixpalette";
+- ft-nixpalette-hyprland modules should NOT re-declare ft-nixpalette options — they
+  read from config."ft-nixpalette".* (which ft-nixpalette declares) and from the JSON files
+- All options live under the `ft-nixpalette-hyprland` namespace
 - All features are opt-in with `enable` options, defaulting to true only for
   core features (swww, hyprlock) and false for potentially conflicting ones (waybar)
 - The Home Manager module handles user-space concerns (hyprlock, waybar CSS,
@@ -96,15 +96,15 @@ that adds Hyprland-ecosystem theming on top of nixpalette. It should:
 - modules/hyprlock.nix   (hyprlock config generation)
 - modules/waybar.nix     (waybar CSS injection)
 - modules/launcher.nix   (rofi/wofi theming)
-- pkgs/nixpalette-switch/ (the live switcher script, written in bash or python)
+- pkgs/ft-nixpalette-switch/ (the live switcher script, written in bash or python)
 - README.md
 
 ## README should document
 
-- Prerequisites: nixpalette must be configured with preloadThemes listing all
+- Prerequisites: ft-nixpalette must be configured with preloadThemes listing all
   themes the user wants to switch between at runtime
-- How to import both nixpalette and nixpalette-hyprland modules
-- The nixpalette-switch script usage
+- How to import both ft-nixpalette and ft-nixpalette-hyprland modules
+- The ft-nixpalette-switch script usage
 - Each module's options table
 - The live switching flow diagram:
-    nixpalette.preloadThemes → themes.json → nixpalette-switch → swww + waybar reload
+    ft-nixpalette.preloadThemes → themes.json → ft-nixpalette-switch → swww + waybar reload

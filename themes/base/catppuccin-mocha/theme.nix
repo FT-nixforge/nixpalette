@@ -47,11 +47,20 @@
     };
   };
 
+  cursor.size = 24;
+
+  opacity = {
+    applications = 0.96;
+    desktop      = 1.0;
+    popups       = 0.98;
+    terminal     = 0.93;
+  };
+
   # Set to a path (e.g. ./wallpaper.png) to ship a wallpaper with the theme.
-  # When null, Stylix generates a wallpaper from the color scheme,
-  # or the user can provide one via stylixOverrides.
+  # When null, ft-nixpalette falls back to the configured default wallpaper
+  # or generates a solid-color wallpaper from the color scheme.
   wallpaper = null;
 
-  # Per-app overrides (reserved for future use).
+  # Extra Stylix overrides merged on top of the theme defaults.
   overrides = {};
 }

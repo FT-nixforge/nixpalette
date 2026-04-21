@@ -12,12 +12,12 @@ let
   resolveWithChain = registry: themeId: visited:
     if builtins.elem themeId visited then
       builtins.throw (
-        "nixpalette: Circular inheritance detected: "
+        "ft-nixpalette: Circular inheritance detected: "
         + lib.concatStringsSep " -> " (visited ++ [ themeId ])
       )
     else if !(registry ? ${themeId}) then
       builtins.throw (
-        "nixpalette: Unknown theme '${themeId}'. "
+        "ft-nixpalette: Unknown theme '${themeId}'. "
         + "Available themes: ${lib.concatStringsSep ", " (lib.attrNames registry)}"
       )
     else

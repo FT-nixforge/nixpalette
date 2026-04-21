@@ -1,7 +1,7 @@
 # Midnight Ember — a deep charcoal dark theme with warm amber and ember accents.
 #
 # This file demonstrates every available field in a base theme.
-# Fields marked "optional" can be omitted — nixpalette will use sensible defaults.
+# Fields marked "optional" can be omitted — ft-nixpalette will use sensible defaults.
 # Fields marked "required" must be present in every base theme.
 {
   # ─── Polarity ────────────────────────────────────────────────────────────────
@@ -87,16 +87,31 @@
     };
   };
 
+  # ─── Cursor ──────────────────────────────────────────────────────────────────
+  # Optional. You can set just the size, or also name/package when you want the
+  # theme to ship a specific cursor family through Stylix.
+  cursor = {
+    size = 24;
+  };
+
+  # ─── Opacity ─────────────────────────────────────────────────────────────────
+  # Optional. These values map directly to Stylix's opacity settings.
+  opacity = {
+    applications = 0.96;
+    desktop      = 1.0;
+    popups       = 0.98;
+    terminal     = 0.93;
+  };
+
   # ─── Wallpaper ───────────────────────────────────────────────────────────────
   # Optional. Path to a wallpaper image file to ship with the theme.
   # Use a path relative to this file, e.g.:  wallpaper = ./wallpaper.png;
-  # When null, nixpalette auto-generates a solid-color wallpaper from base00
+  # When null, ft-nixpalette auto-generates a solid-color wallpaper from base00
   # using ImageMagick at build time. Stylix's image option is always satisfied.
-  wallpaper = "./default.png";
+  wallpaper = ./default.jpg;
 
-  # ─── Per-app Overrides ───────────────────────────────────────────────────────
-  # Reserved for future use. Set to an empty attrset for now.
-  # Will eventually allow per-application Stylix or raw config overrides
-  # scoped to this theme, without touching the user's global config.
+  # ─── Extra Stylix Overrides ──────────────────────────────────────────────────
+  # Optional. Any values here are merged on top of the theme defaults, but still
+  # remain lower priority than "ft-nixpalette".stylixOverrides or direct stylix.*.
   overrides = {};
 }

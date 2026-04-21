@@ -47,6 +47,15 @@
     };
   };
 
+  cursor.size = 24;
+
+  opacity = {
+    applications = 0.96;
+    desktop      = 1.0;
+    popups       = 0.98;
+    terminal     = 0.93;
+  };
+
   wallpaper = null;
 
   overrides = {};

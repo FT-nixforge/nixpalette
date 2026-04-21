@@ -1,19 +1,19 @@
-# Home Manager module for nixpalette.
+# Home Manager module for ft-nixpalette.
 # Declares user-facing options, loads themes, resolves inheritance,
 # and delegates to Stylix via modules/stylix.nix.
-{ nixpaletteLib, builtinThemesDir, defaultWallpaper }:
+{ ftNixpaletteLib, builtinThemesDir, defaultWallpaper }:
 
 { config, lib, pkgs, ... }:
 
 let
-  cfg = config.nixpalette;
+  cfg = config."ft-nixpalette";
 
-  allThemes = nixpaletteLib.loadAllThemes {
+  allThemes = ftNixpaletteLib.loadAllThemes {
     builtinRoot = builtinThemesDir;
     userRoot    = cfg.userThemeDir;
   };
 
-  resolvedTheme = nixpaletteLib.resolve allThemes cfg.theme;
+  resolvedTheme = ftNixpaletteLib.resolve allThemes cfg.theme;
 
   stylixConfig = import ./stylix.nix {
     inherit lib pkgs resolvedTheme;
@@ -31,7 +31,7 @@ let
     let
       preloadIds  = lib.unique ([ cfg.theme ] ++ cfg.preloadThemes);
       resolveOne  = themeId:
-        let r = nixpaletteLib.resolve allThemes themeId;
+        let r = ftNixpaletteLib.resolve allThemes themeId;
         in {
           themeId  = themeId;
           polarity = r.polarity;
@@ -44,9 +44,9 @@ let
 
 in
 {
-  options.nixpalette = {
+  options."ft-nixpalette" = {
 
-    enable = lib.mkEnableOption "nixpalette theme management (Home Manager)";
+    enable = lib.mkEnableOption "ft-nixpalette theme management (Home Manager)";
 
     theme = lib.mkOption {
       type        = lib.types.str;
@@ -86,7 +86,7 @@ in
       default     = defaultWallpaper;
       description = ''
         Wallpaper used for any theme that does not ship its own wallpaper image.
-        Defaults to the flake-root wallpaper.png when present, otherwise null.
+        Defaults to a flake-root wallpaper image when present, otherwise null.
         When null, a solid-color wallpaper is generated from the theme's base00.
         Set this to override the flake default with your own image.
       '';
@@ -98,7 +98,7 @@ in
       default     = [];
       description = ''
         List of additional theme IDs to resolve and bake into
-        $XDG_DATA_HOME/nixpalette/themes.json at build time.
+        $XDG_DATA_HOME/ft-nixpalette/themes.json at build time.
         The active theme is always included automatically.
         A live theme switcher can read this file and apply any of the
         preloaded palettes at runtime without a Home Manager rebuild.
@@ -117,7 +117,7 @@ in
   config = lib.mkIf cfg.enable {
     stylix = stylixConfig;
 
-    xdg.dataFile."nixpalette/colors.json".text = colorsJson;
-    xdg.dataFile."nixpalette/themes.json".text  = themesJson;
+    xdg.dataFile."ft-nixpalette/colors.json".text = colorsJson;
+    xdg.dataFile."ft-nixpalette/themes.json".text  = themesJson;
   };
 }

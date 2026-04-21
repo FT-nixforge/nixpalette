@@ -16,4 +16,8 @@
       terminal     = 11;
     };
   };
+
+  cursor.size = 22;
+
+  opacity.terminal = 0.91;
 }

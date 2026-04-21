@@ -1,11 +1,11 @@
-Place a wallpaper image named `wallpaper.png` in this directory to use it as the
+Place a wallpaper image named `wallpaper.png`, `wallpaper.jpg`, or `wallpaper.jpeg` in this directory to use it as the
 default wallpaper for all themes that do not ship their own image.
 
-nixpalette will pick it up automatically at build time — no configuration needed.
+ft-nixpalette will pick it up automatically at build time — no configuration needed.
 
 To override it per-user, set:
 
-  nixpalette.defaultWallpaper = ./path/to/your/wallpaper.png;
+  "ft-nixpalette".defaultWallpaper = ./path/to/your/wallpaper.png;
 
 Supported formats: PNG (recommended), JPEG, any format supported by ImageMagick.
 Any resolution works; Stylix and your compositor handle scaling.

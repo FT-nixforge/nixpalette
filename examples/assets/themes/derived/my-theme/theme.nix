@@ -5,8 +5,8 @@
 # a few accent colors, the monospace font, and the terminal font size.
 #
 # To use it, set:
-#   nixpalette.theme = "user:derived/my-theme";
-#   nixpalette.userThemeDir = ./assets/themes;
+#   "ft-nixpalette".theme = "user:derived/my-theme";
+#   "ft-nixpalette".userThemeDir = ./assets/themes;
 {
   parent = "builtin:base/catppuccin-mocha";
 
@@ -26,6 +26,9 @@
       terminal = 14;
     };
   };
+
+  cursor.size = 22;
+  opacity.terminal = 0.92;
 
   # Uncomment to ship a wallpaper with this theme:
   # wallpaper = ./wallpaper.jpg;

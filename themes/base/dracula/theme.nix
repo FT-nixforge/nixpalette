@@ -22,6 +22,40 @@
     base0F = "ff79c6"; # Pink
   };
 
+  fonts = {
+    serif = {
+      name    = "Noto Serif";
+      package = "noto-fonts";
+    };
+    sansSerif = {
+      name    = "Inter";
+      package = "inter";
+    };
+    monospace = {
+      name    = "Fira Code";
+      package = "fira-code";
+    };
+    emoji = {
+      name    = "Noto Color Emoji";
+      package = "noto-fonts-color-emoji";
+    };
+    sizes = {
+      applications = 12;
+      desktop      = 11;
+      popups       = 10;
+      terminal     = 13;
+    };
+  };
+
+  cursor.size = 24;
+
+  opacity = {
+    applications = 0.96;
+    desktop      = 1.0;
+    popups       = 0.98;
+    terminal     = 0.93;
+  };
+
   wallpaper = null;
   overrides = {};
 }

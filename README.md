@@ -1,11 +1,11 @@
-# nixpalette
+# ft-nixpalette
 
-A reusable NixOS theme framework built on top of [Stylix](https://github.com/danth/stylix). nixpalette provides folder-based theme definitions, a parent-child inheritance model, and a clean separation between built-in and user-defined themes.
+A reusable NixOS theme framework built on top of [Stylix](https://github.com/danth/stylix). ft-nixpalette provides folder-based theme definitions, a parent-child inheritance model, and a clean separation between built-in and user-defined themes.
 
 ## File Tree
 
 ```
-nixpalette/
+ft-nixpalette/
 ├── flake.nix                              # Flake entry point
 ├── lib/
 │   ├── default.nix                        # Re-exports all lib functions
@@ -35,25 +35,25 @@ nixpalette/
 
 ## Quick Start
 
-### 1. Add nixpalette to your flake inputs
+### 1. Add ft-nixpalette to your flake inputs
 
 ```nix
 {
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
-    nixpalette = {
-      url = "github:FTMahringer/nixpalette";
-      # nixpalette brings Stylix as its own input — no need to add it separately
+    "ft-nixpalette" = {
+      url = "github:FT-nixforge/ft-nixpalette";
+      # ft-nixpalette brings Stylix as its own input — no need to add it separately
     };
   };
 
-  outputs = { nixpkgs, nixpalette, ... }: {
+  outputs = inputs@{ nixpkgs, ... }: {
     nixosConfigurations.myHost = nixpkgs.lib.nixosSystem {
       system = "x86_64-linux";
       modules = [
-        nixpalette.nixosModules.default
+        inputs."ft-nixpalette".nixosModules.default
         {
-          nixpalette = {
+          "ft-nixpalette" = {
             enable = true;
             theme = "builtin:base/catppuccin-mocha";
           };
@@ -70,9 +70,9 @@ nixpalette/
 homeConfigurations.myUser = home-manager.lib.homeManagerConfiguration {
   # ...
   modules = [
-    nixpalette.homeModules.default
+    inputs."ft-nixpalette".homeModules.default
     {
-      nixpalette = {
+      "ft-nixpalette" = {
         enable = true;
         theme = "builtin:base/nord";
       };
@@ -83,14 +83,16 @@ homeConfigurations.myUser = home-manager.lib.homeManagerConfiguration {
 
 ## Options Reference
 
+Because the option namespace contains a hyphen, quote it in Nix expressions as `"ft-nixpalette"`.
+
 | Option | Type | Default | Description |
 |--------|------|---------|-------------|
-| `nixpalette.enable` | `bool` | `false` | Enable nixpalette theme management |
-| `nixpalette.theme` | `str` | — | Namespaced theme ID (e.g. `"builtin:base/catppuccin-mocha"`) |
-| `nixpalette.userThemeDir` | `null or path` | `null` | Path to user theme directory |
-| `nixpalette.stylixOverrides` | `attrs` | `{}` | Extra Stylix options merged on top of the theme |
-| `nixpalette.specialisations` | `attrsOf str` | `{}` | Pre-build theme variants as NixOS specialisations (NixOS only) |
-| `nixpalette.preloadThemes` | `listOf str` | `[]` | Extra themes to resolve and bake into `themes.json` at build time |
+| `"ft-nixpalette".enable` | `bool` | `false` | Enable ft-nixpalette theme management |
+| `"ft-nixpalette".theme` | `str` | — | Namespaced theme ID (e.g. `"builtin:base/catppuccin-mocha"`) |
+| `"ft-nixpalette".userThemeDir` | `null or path` | `null` | Path to user theme directory |
+| `"ft-nixpalette".stylixOverrides` | `attrs` | `{}` | Extra Stylix options merged on top of the theme |
+| `"ft-nixpalette".specialisations` | `attrsOf str` | `{}` | Pre-build theme variants as NixOS specialisations (NixOS only) |
+| `"ft-nixpalette".preloadThemes` | `listOf str` | `[]` | Extra themes to resolve and bake into `themes.json` at build time |
 
 ## Theme Identifiers
 
@@ -98,8 +100,8 @@ Themes use namespaced identifiers to prevent ambiguity:
 
 | ID Format | Meaning |
 |-----------|---------|
-| `builtin:base/<name>` | Base theme shipped with nixpalette |
-| `builtin:derived/<name>` | Derived theme shipped with nixpalette |
+| `builtin:base/<name>` | Base theme shipped with ft-nixpalette |
+| `builtin:derived/<name>` | Derived theme shipped with ft-nixpalette |
 | `user:base/<name>` | User-defined standalone theme |
 | `user:derived/<name>` | User-defined theme inheriting from another |
 
@@ -107,10 +109,10 @@ Themes use namespaced identifiers to prevent ambiguity:
 
 ### Directory structure
 
-Your theme directory (set via `nixpalette.userThemeDir`) must follow this layout:
+Your theme directory (set via `"ft-nixpalette".userThemeDir`) must follow this layout:
 
 ```
-assets/themes/           # ← nixpalette.userThemeDir = ./assets/themes;
+assets/themes/           # ← "ft-nixpalette".userThemeDir = ./assets/themes;
 ├── base/
 │   └── my-base-theme/
 │       ├── theme.nix    # Required
@@ -159,14 +161,31 @@ assets/themes/           # ← nixpalette.userThemeDir = ./assets/themes;
     };
   };
 
+  cursor = {
+    size = 24;
+    # name = "Bibata-Modern-Ice";   # optional
+    # package = "bibata-cursors";   # optional
+  };
+
+  opacity = {
+    applications = 0.96;
+    desktop      = 1.0;
+    popups       = 0.98;
+    terminal     = 0.93;
+  };
+
   wallpaper = ./wallpaper.png; # or null
-  overrides = {};              # reserved for future per-app overrides
+  overrides = {
+    # Any extra Stylix options you want this theme to provide.
+  };
 }
 ```
 
-When `wallpaper` is `null`, nixpalette automatically generates a solid-color wallpaper from the theme's background color (`base00`). To ship a custom wallpaper, place the image file in the theme directory and reference it with a relative path.
+When `wallpaper` is `null`, ft-nixpalette automatically generates a solid-color wallpaper from the theme's background color (`base00`). To ship a custom wallpaper, place the image file in the theme directory and reference it with a relative path.
 
 Font `package` values are nixpkgs attribute paths. Use top-level names like `"inter"` or dot-separated paths for nested packages like `"nerd-fonts.jetbrains-mono"`.
+
+`cursor` and `opacity` are optional convenience fields that map directly to Stylix. `overrides` is also optional and is merged on top of the theme defaults before `"ft-nixpalette".stylixOverrides` is applied.
 
 ### Derived theme format (`theme.nix`)
 
@@ -182,6 +201,8 @@ Derived themes declare a `parent` and override only what they need:
   };
 
   fonts.sizes.terminal = 14;
+  cursor.size = 22;
+  opacity.terminal = 0.91;
 }
 ```
 
@@ -189,7 +210,7 @@ Derived themes declare a `parent` and override only what they need:
 
 ```nix
 {
-  nixpalette = {
+  "ft-nixpalette" = {
     enable = true;
     theme = "user:derived/my-theme";
     userThemeDir = ./assets/themes;
@@ -217,7 +238,7 @@ There are two ways to override what the theme provides:
 ### Via `stylixOverrides`
 
 ```nix
-nixpalette = {
+"ft-nixpalette" = {
   enable = true;
   theme = "builtin:base/catppuccin-mocha";
   stylixOverrides = {
@@ -229,11 +250,11 @@ nixpalette = {
 
 ### Via direct `stylix.*` options
 
-Since nixpalette sets Stylix values with `mkDefault` priority, you can override any setting directly:
+Since ft-nixpalette sets Stylix values with `mkDefault` priority, you can override any setting directly:
 
 ```nix
-nixpalette.enable = true;
-nixpalette.theme = "builtin:base/catppuccin-mocha";
+"ft-nixpalette".enable = true;
+"ft-nixpalette".theme = "builtin:base/catppuccin-mocha";
 
 # Direct override — takes precedence over theme values
 stylix.fonts.monospace = {
@@ -260,6 +281,7 @@ stylix.fonts.monospace = {
 | `builtin:base/one-dark` | dark | Atom's iconic dark theme with cool blue-grey tones |
 | `builtin:base/rose-pine` | dark | Soothingly dark with dusty rose and warm neutrals |
 | `builtin:base/everforest-dark` | dark | Comfortable, nature-inspired green-based palette |
+| `builtin:base/midnight-ember` | dark | Deep charcoal reference theme with warm amber accents |
 
 ### Derived themes
 
@@ -272,12 +294,12 @@ stylix.fonts.monospace = {
 
 ## Fast Theme Switching with Specialisations
 
-nixpalette supports NixOS [specialisations](https://nixos.wiki/wiki/Specialisation) to pre-build multiple theme configurations into a single system closure. This enables near-instant theme switching — no network fetch or Nix build required.
+ft-nixpalette supports NixOS [specialisations](https://nixos.wiki/wiki/Specialisation) to pre-build multiple theme configurations into a single system closure. This enables near-instant theme switching — no network fetch or Nix build required.
 
 ### Setup
 
 ```nix
-nixpalette = {
+"ft-nixpalette" = {
   enable = true;
   theme = "builtin:base/catppuccin-mocha";  # default theme
   specialisations = {
@@ -297,26 +319,26 @@ sudo /run/current-system/specialisation/nord/bin/switch-to-configuration switch
 sudo /run/current-system/bin/switch-to-configuration switch
 ```
 
-Each specialisation is a full NixOS configuration with a different `nixpalette.theme`. All specialisations share the same Nix store, so common packages are not duplicated.
+Each specialisation is a full NixOS configuration with a different `"ft-nixpalette".theme`. All specialisations share the same Nix store, so common packages are not duplicated.
 
 > **Note:** Specialisations are a NixOS-only feature. They are not available in Home Manager.
 
 ## Colors Export
 
-nixpalette generates two JSON files at build time:
+ft-nixpalette generates two JSON files at build time:
 
 - **`colors.json`** — the active theme's resolved palette
-  - NixOS: `/etc/nixpalette/colors.json`
-  - Home Manager: `$XDG_DATA_HOME/nixpalette/colors.json`
+  - NixOS: `/etc/ft-nixpalette/colors.json`
+  - Home Manager: `$XDG_DATA_HOME/ft-nixpalette/colors.json`
 
 - **`themes.json`** — every preloaded theme's resolved palette, keyed by theme ID
-  - NixOS: `/etc/nixpalette/themes.json`
-  - Home Manager: `$XDG_DATA_HOME/nixpalette/themes.json`
+  - NixOS: `/etc/ft-nixpalette/themes.json`
+  - Home Manager: `$XDG_DATA_HOME/ft-nixpalette/themes.json`
 
 The active theme is always included in `themes.json`. Add more themes via `preloadThemes`:
 
 ```nix
-nixpalette = {
+"ft-nixpalette" = {
   enable = true;
   theme  = "builtin:base/catppuccin-mocha";
   preloadThemes = [
@@ -331,13 +353,13 @@ This bakes the full base16 palette of every listed theme into the system closure
 
 ```bash
 # Read the current accent color
-jq -r '.base16.base0D' /etc/nixpalette/colors.json
+jq -r '.base16.base0D' /etc/ft-nixpalette/colors.json
 
 # List all preloaded theme IDs
-jq -r 'keys[]' /etc/nixpalette/themes.json
+jq -r 'keys[]' /etc/ft-nixpalette/themes.json
 
 # Get the full palette for a specific preloaded theme
-jq '.["builtin:base/nord"].base16' /etc/nixpalette/themes.json
+jq '.["builtin:base/nord"].base16' /etc/ft-nixpalette/themes.json
 ```
 
 The `themes.json` structure per entry:
@@ -355,10 +377,10 @@ The `themes.json` structure per entry:
 
 ## Future Theme Switcher Integration
 
-nixpalette is designed to support a future theme switcher:
+ft-nixpalette is designed to support a future theme switcher:
 
-- **Discovery:** Themes are discovered by scanning `base/` and `derived/` directories under both the builtin and user roots. A switcher CLI can call `nixpaletteLib.loadAllThemes` to enumerate all available themes with their metadata.
-- **Selection:** The active theme is a plain string option (`nixpalette.theme`). A switcher only needs to write the new theme ID and trigger a NixOS rebuild (or switch to a pre-built specialisation).
+- **Discovery:** Themes are discovered by scanning `base/` and `derived/` directories under both the builtin and user roots. A switcher CLI can call `ftNixpaletteLib.loadAllThemes` to enumerate all available themes with their metadata.
+- **Selection:** The active theme is a plain string option (`"ft-nixpalette".theme`). A switcher only needs to write the new theme ID and trigger a NixOS rebuild (or switch to a pre-built specialisation).
 - **Preview:** Each theme can include a `preview` field in `meta.nix` pointing to a screenshot, enabling visual browsing before selection.
 
 ## Known Limitations
