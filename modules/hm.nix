@@ -1,4 +1,4 @@
-﻿# Home Manager module for ft-nixpalette.
+# Home Manager module for ft-nixpalette.
 # Declares user-facing options, loads themes, resolves inheritance,
 # and delegates to Stylix via modules/stylix.nix.
 { ftNixpaletteLib, builtinThemesDir, defaultWallpaper }:
