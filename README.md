@@ -110,7 +110,12 @@ stylixOverrides.cursor.size = 32;
 
 Auto-configure ft-nixpalette for all Home-Manager users. **Default:** `true`
 
-When enabled, the NixOS module propagates all settings (`theme`, `userThemeDir`, `specialisations`, `preloadThemes`, `stylixOverrides`) to every Home-Manager user automatically. Set to `false` to configure Home-Manager manually.
+When enabled, the NixOS module:
+
+1. **Auto-imports** the ft-nixpalette Home-Manager module via `home-manager.sharedModules` — you do **not** need to add `inputs.nixpalette.homeModules.default` to your `home.nix` imports.
+2. **Propagates** all settings (`theme`, `userThemeDir`, `specialisations`, `preloadThemes`, `stylixOverrides`) to every Home-Manager user automatically.
+
+Set to `false` to configure Home-Manager manually (see below).
 
 ### `ft-nixpalette.integrations.de`
 
@@ -201,7 +206,7 @@ No manual `ft-nixpalette = { ... }` in `home.nix`. No specialisation mapping. No
 
 ## Manual Home-Manager Setup (Advanced)
 
-If you disable `homeManagerIntegration`, import the Home-Manager module manually:
+If you disable `homeManagerIntegration` (or use a standalone Home-Manager setup without NixOS), import the Home-Manager module manually:
 
 ```nix
 imports = [ inputs.nixpalette.homeModules.default ];
@@ -211,6 +216,8 @@ ft-nixpalette = {
   theme  = "builtin:base/catppuccin-mocha";
 };
 ```
+
+> **Why this is needed:** The NixOS module normally injects the Home-Manager module automatically via `home-manager.sharedModules`. If you disable `homeManagerIntegration`, the HM module is never imported, so the `ft-nixpalette.*` options don't exist in the HM context — leading to `error: The option 'ft-nixpalette.theme' was accessed but has no value defined`.
 
 ---
 
