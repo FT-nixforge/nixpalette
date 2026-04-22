@@ -29,7 +29,7 @@
       provides     = [ "nixosModules" "homeModules" "lib" ];
       dependencies = [];
       status       = "stable";
-      version      = "1.0.1";
+      version      = "1.1.0";
     };
     lib = ftNixpaletteLib;
 
