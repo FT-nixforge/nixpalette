@@ -1,4 +1,4 @@
-# Home Manager module for ft-nixpalette.
+﻿# Home Manager module for ft-nixpalette.
 # Declares user-facing options, loads themes, resolves inheritance,
 # and delegates to Stylix via modules/stylix.nix.
 { ftNixpaletteLib, builtinThemesDir, defaultWallpaper }:
@@ -110,7 +110,7 @@ in
       default     = [];
       description = ''
         List of additional theme IDs to resolve and bake into
-        $XDG_DATA_HOME/ft-nixpalette/themes.json at build time.
+        /ft-nixpalette/themes.json at build time.
         The active theme is always included automatically.
         A live theme switcher can read this file and apply any of the
         preloaded palettes at runtime without a Home Manager rebuild.
@@ -134,7 +134,13 @@ in
       xdg.dataFile."ft-nixpalette/themes.json".text  = themesJson;
     }
 
-    (lib.optionalAttrs (cfg.integrations.de != null)
-      (deHmConfigs.${cfg.integrations.de} or {}))
+    # DE integrations — each guarded by its own mkIf to avoid evaluating
+    # cfg.integrations.de during the 'let' binding (which causes infinite recursion).
+    (lib.mkIf (cfg.integrations.de == "Hyprland") deHmConfigs.Hyprland)
+    (lib.mkIf (cfg.integrations.de == "MangoWC")  deHmConfigs.MangoWC)
+    (lib.mkIf (cfg.integrations.de == "Niri")     deHmConfigs.Niri)
+    (lib.mkIf (cfg.integrations.de == "GNOME")    deHmConfigs.GNOME)
+    (lib.mkIf (cfg.integrations.de == "KDE")      deHmConfigs.KDE)
+    (lib.mkIf (cfg.integrations.de == "COSMIC")   deHmConfigs.COSMIC)
   ]);
 }

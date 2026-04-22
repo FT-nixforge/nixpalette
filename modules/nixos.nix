@@ -1,4 +1,4 @@
-# NixOS module for ft-nixpalette.
+﻿# NixOS module for ft-nixpalette.
 # Declares user-facing options, loads themes, resolves inheritance,
 # and delegates to Stylix via modules/stylix.nix.
 { ftNixpaletteLib, builtinThemesDir, defaultWallpaper }:
@@ -161,7 +161,13 @@ in
       }) cfg.specialisations;
     }
 
-    (lib.optionalAttrs (cfg.integrations.de != null)
-      (deNixosConfigs.${cfg.integrations.de} or {}))
+    # DE integrations — each guarded by its own mkIf to avoid evaluating
+    # cfg.integrations.de during the 'let' binding (which causes infinite recursion).
+    (lib.mkIf (cfg.integrations.de == "Hyprland") deNixosConfigs.Hyprland)
+    (lib.mkIf (cfg.integrations.de == "MangoWC")  deNixosConfigs.MangoWC)
+    (lib.mkIf (cfg.integrations.de == "Niri")     deNixosConfigs.Niri)
+    (lib.mkIf (cfg.integrations.de == "GNOME")    deNixosConfigs.GNOME)
+    (lib.mkIf (cfg.integrations.de == "KDE")      deNixosConfigs.KDE)
+    (lib.mkIf (cfg.integrations.de == "COSMIC")   deNixosConfigs.COSMIC)
   ]);
 }
