@@ -154,7 +154,6 @@ in
       # This HM module only provides: DE integration, theme files,
       # and the config.lib.stylix.colors API for user modules.
 
-    {
       xdg.dataFile."ft-nixpalette/colors.json".text = colorsJson;
       xdg.dataFile."ft-nixpalette/themes.json".text  = themesJson;
     }
