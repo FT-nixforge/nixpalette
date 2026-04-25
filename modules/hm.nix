@@ -168,4 +168,4 @@ in
     (lib.mkIf (cfg.integrations.de == "KDE")      (deHmConfigs.KDE null))
     (lib.mkIf (cfg.integrations.de == "COSMIC")   (deHmConfigs.COSMIC null))
   ]);
-}
+};
