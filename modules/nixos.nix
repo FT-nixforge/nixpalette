@@ -15,22 +15,23 @@ let
   # Pre-imported HM module so we can inject it via sharedModules
   hmModule = import ./hm.nix { inherit ftNixpaletteLib builtinThemesDir defaultWallpaper; };
 
-  # Default stylix overrides (fonts, cursor, opacity)
+  # Default stylix overrides (fonts, cursor, opacity).
+  # These are applied with mkDefault priority so theme values still win.
   defaultStylixOverrides = {
     fonts.monospace = {
-      name = "JetBrainsMono Nerd Font";
-      package = pkgs.nerd-fonts.jetbrains-mono;
+      name = lib.mkDefault "JetBrainsMono Nerd Font";
+      package = lib.mkDefault pkgs.nerd-fonts.jetbrains-mono;
     };
     cursor = {
-      package = pkgs.bibata-cursors;
-      name = "Bibata-Modern-Classic";
-      size = 24;
+      package = lib.mkDefault pkgs.bibata-cursors;
+      name = lib.mkDefault "Bibata-Modern-Classic";
+      size = lib.mkDefault 24;
     };
     opacity = {
-      terminal = 0.95;
-      applications = 1.0;
-      desktop = 1.0;
-      popups = 1.0;
+      terminal = lib.mkDefault 0.95;
+      applications = lib.mkDefault 1.0;
+      desktop = lib.mkDefault 1.0;
+      popups = lib.mkDefault 1.0;
     };
   };
 

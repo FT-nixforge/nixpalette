@@ -15,14 +15,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v6
         with:
-          persist-credentials: false
-
-      - name: Remove GitHub auth headers
-        run: |
-          git config --global --unset-all http.https://github.com/.extraheader || true
-          git config --global --unset-all http.https://api.github.com/.extraheader || true
-          git config --local --unset-all http.https://github.com/.extraheader || true
-          git config --local --unset-all http.https://api.github.com/.extraheader || true
+          token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Install Nix
         uses: cachix/install-nix-action@v27
