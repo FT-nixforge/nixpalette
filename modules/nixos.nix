@@ -187,15 +187,10 @@ in
         hmModule
       ];
 
-      home-manager.users = lib.mkIf (hmAvailable && cfg.homeManagerIntegration.enable) (
-        lib.mapAttrs (_: _: {
-          "ft-nixpalette" = {
-            enable = true;
-            inherit (cfg) theme userThemeDir specialisations preloadThemes;
-            stylixOverrides = cfg.stylixOverrides;
-          };
-        }) config.home-manager.users
-      );
+      # NOTE: We intentionally do NOT set home-manager.users here.
+      # The infinite recursion (reading config.home-manager.users to set home-manager.users)
+      # is avoided by letting the user configure ft-nixpalette in their HM config manually.
+      # The HM module is still available via sharedModules for convenience.
 
       # ── Specialisations ──────────────────────────────────────────────────
       specialisation = lib.mapAttrs
@@ -205,12 +200,8 @@ in
               "ft-nixpalette".theme          = lib.mkForce themeId;
               "ft-nixpalette".specialisations = lib.mkForce {};
             }
-            # Auto-propagate specialisations to Home-Manager users
-            (lib.mkIf (hmAvailable && cfg.homeManagerIntegration.enable) {
-              home-manager.users = lib.mapAttrs (_: _: {
-                "ft-nixpalette".theme = lib.mkForce themeId;
-              }) config.home-manager.users;
-            })
+            # NOTE: Specialisations are NixOS-only. HM users must switch
+            # via the NixOS specialisation or configure ft-nixpalette.theme manually.
           ];
         })
         cfg.specialisations;
