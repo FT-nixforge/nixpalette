@@ -146,12 +146,26 @@ in
       '';
     };
 
+    enableStylix = lib.mkOption {
+      type        = lib.types.bool;
+      default     = true;
+      description = 
+        Whether to configure Stylix in the Home Manager module.
+        Disable this when Stylix is already configured by the NixOS module
+        to avoid duplicate definition errors.
+        When disabled, the HM module still provides theme resolution,
+        DE integration, and the config.lib.stylix.colors API.
+      ;
+    };
+
   };
 
   config = lib.mkIf cfg.enable (lib.mkMerge [
-    {
+    (lib.mkIf cfg.enableStylix {
       stylix = stylixConfig;
+    })
 
+    {
       xdg.dataFile."ft-nixpalette/colors.json".text = colorsJson;
       xdg.dataFile."ft-nixpalette/themes.json".text  = themesJson;
     }
