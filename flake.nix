@@ -28,8 +28,8 @@
       repo         = "github:FT-nixforge/nixpalette";
       provides     = [ "nixosModules" "homeModules" "lib" ];
       dependencies = [];
-      status       = "stable";
-      version      = "1.3.0";
+      status       = "unstable";
+      version      = "1.4.0";
     };
     lib = ftNixpaletteLib;
 
